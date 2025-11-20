@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { generateObject } from "ai"
-import { perplexity } from "@ai-sdk/perplexity"
+import { openai } from "@ai-sdk/openai"
 import { z } from "zod"
 
 const IndustryBenchmarkSchema = z.object({
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     console.log("[v0] Fetching real-time industry benchmarks for:", { kpiName, industry, platform })
 
     const result = await generateObject({
-      model: perplexity("sonar-pro"),
+      model: openai("gpt-4o-mini"),
       prompt: `You are an expert business analyst with access to current industry data. Provide real-time industry benchmarks for the following KPI:
 
 KPI: ${kpiName}

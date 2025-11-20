@@ -560,8 +560,9 @@ export function Assumptions({ data, onUpdate, onNext, onPrevious }: AssumptionsP
   const selectedKPIs = Array.isArray(data.kpis) ? data.kpis : []
 
   const kpiNamesString = useMemo(() => {
-    return selectedKPIs.map((kpi: any) => (typeof kpi === "string" ? kpi : kpi.name)).join(",")
-  }, [selectedKPIs.length, JSON.stringify(selectedKPIs)])
+    const selectedKPINames = selectedKPIs.map((kpi: any) => (typeof kpi === "string" ? kpi : kpi.name))
+    return selectedKPINames.sort().join("|")
+  }, [selectedKPIs])
 
   const [analysisResult, setAnalysisResult] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -611,14 +612,6 @@ export function Assumptions({ data, onUpdate, onNext, onPrevious }: AssumptionsP
     })
 
     setKpiAssumptions(newAssumptions)
-
-    // Only update parent if assumptions actually changed and we're not in initial render
-    if (kpisChanged && initializedRef.current) {
-      // Use setTimeout to defer the update to after render completes
-      setTimeout(() => {
-        onUpdate({ ...data, kpiAssumptions: newAssumptions })
-      }, 0)
-    }
   }, [kpiNamesString]) // Only depend on stable KPI names string
 
   const fetchedKPIsRef = useRef<Set<string>>(new Set())
@@ -726,36 +719,20 @@ export function Assumptions({ data, onUpdate, onNext, onPrevious }: AssumptionsP
 
       console.log("[v0] Response status:", response.status)
 
+      const result = await response.json()
+
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error("[v0] API error:", errorText)
-        throw new Error(errorText || `API request failed with status ${response.status}`)
+        console.error("[v0] API error:", result.error)
+        throw new Error(result.error || `API request failed with status ${response.status}`)
       }
 
-      // Handle streaming response
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-      let fullResponse = ""
-
-      if (reader) {
-        console.log("[v0] Starting to read stream...")
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            console.log("[v0] Stream complete")
-            break
-          }
-
-          const chunk = decoder.decode(value, { stream: true })
-          fullResponse += chunk
-          setAnalysisResult(fullResponse)
-        }
-      }
+      console.log("[v0] Analysis complete")
+      setAnalysisResult(result.analysis)
     } catch (error) {
       console.error("[v0] Error analyzing assumptions:", error)
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
       setAnalysisResult(
-        `Error: ${errorMessage}\n\nPlease check:\n1. Your PERPLEXITY_API_KEY environment variable is set\n2. Your API key is valid\n3. You have internet connectivity`,
+        `Error: ${errorMessage}\n\nPlease check:\n1. Your OPENAI_API_KEY environment variable is set\n2. Your API key is valid\n3. You have internet connectivity`,
       )
     } finally {
       setIsAnalyzing(false)
