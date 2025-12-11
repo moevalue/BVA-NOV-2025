@@ -102,6 +102,22 @@ export function ProjectSetup({ data, onUpdate, onNext }: ProjectSetupProps) {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Select onValueChange={(value) => handleInputChange("location", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="brazil">Brazil</SelectItem>
+                    <SelectItem value="canada">Canada</SelectItem>
+                    <SelectItem value="germany">Germany</SelectItem>
+                    <SelectItem value="uk">UK</SelectItem>
+                    <SelectItem value="usa">USA</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="space-y-2">
