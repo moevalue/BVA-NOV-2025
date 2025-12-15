@@ -614,7 +614,7 @@ export function Assumptions({ data, onUpdate, onNext, onPrevious }: AssumptionsP
     }
 
     // Check if we need to initialize or update
-    const existingAssumptions = data.kpiAssumptions || []
+    const existingAssumptions = Array.isArray(data.kpiAssumptions) ? data.kpiAssumptions : []
     const existingKPINames = existingAssumptions.map((ka: KPIAssumption) => ka.kpiName)
 
     // Only update if KPIs have actually changed
