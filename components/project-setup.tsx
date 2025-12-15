@@ -232,24 +232,6 @@ export function ProjectSetup({ data, onUpdate, onNext }: ProjectSetupProps) {
                     <SelectItem value="ccaas" className="bg-yellow-100 hover:bg-yellow-200 text-yellow-900 font-medium">
                       CcaaS ✓ Ready
                     </SelectItem>
-                    <SelectItem
-                      value="field-services"
-                      className="bg-yellow-100 hover:bg-yellow-200 text-yellow-900 font-medium"
-                    >
-                      Field Services ✓ Ready
-                    </SelectItem>
-                    <SelectItem value="copilot" className="text-muted-foreground">
-                      Copilot (In Development)
-                    </SelectItem>
-                    <SelectItem value="crm" className="text-muted-foreground">
-                      CRM (In Development)
-                    </SelectItem>
-                    <SelectItem value="f-and-o" className="text-muted-foreground">
-                      F&O (In Development)
-                    </SelectItem>
-                    <SelectItem value="other" className="text-muted-foreground">
-                      Other (In Development)
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -262,15 +244,11 @@ export function ProjectSetup({ data, onUpdate, onNext }: ProjectSetupProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="rom-bvc">ROM BVC</SelectItem>
-                    <SelectItem value="detailed-bvc">Detailed BVC</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-xs text-muted-foreground space-y-1">
                   <p>
                     <strong>Rough Order of Magnitude(ROM) BVC:</strong> Limited to 4 KPIs maximum
-                  </p>
-                  <p>
-                    <strong>Detailed BVC:</strong> Unlimited number of KPIs
                   </p>
                 </div>
               </div>

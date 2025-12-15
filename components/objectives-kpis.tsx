@@ -165,8 +165,130 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
   const isFieldServices =
     platformSelection.toLowerCase().includes("field") && platformSelection.toLowerCase().includes("service")
   const isCcaaS = platformSelection.toLowerCase().includes("ccaas")
-  const isSupportedPlatform = isFieldServices || isCcaaS
-  const valueTreeData = isFieldServices ? fieldServicesValueTreeData : ccaasValueTreeData
+  const isCRM = platformSelection.toLowerCase().includes("crm")
+  const isSupportedPlatform = isFieldServices || isCcaaS || isCRM
+
+  let valueTreeData = ccaasValueTreeData
+  if (isFieldServices) {
+    valueTreeData = fieldServicesValueTreeData
+  } else if (isCRM) {
+    // CRM value tree data
+    valueTreeData = {
+      objectives: [
+        {
+          id: "increase-sales-opportunities",
+          title: "Increase Sales Opportunities",
+          isPrimary: true,
+          valueDrivers: [
+            {
+              id: "improve-revenue",
+              title: "Improve Revenue",
+              kpis: [
+                { id: "avg-sale-customer", title: "Average Sale/Customer" },
+                { id: "opportunity-win-rate", title: "Opportunity Win Rate" },
+                { id: "proposed-margin", title: "Proposed Margin/Target Margin by Customer" },
+                { id: "new-business-opps", title: "New business opportunities/new customers" },
+                { id: "customer-engagement", title: "New Customer Engagement/Opportunity" },
+                { id: "opportunity-lead-time", title: "Opportunity Lead-Time/Customer" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "increase-customer-retention",
+          title: "Increase Customer Retention",
+          isPrimary: false,
+          valueDrivers: [
+            {
+              id: "incumbency-success",
+              title: "Incumbency Success",
+              kpis: [
+                { id: "net-follow-on-revenue", title: "Net Follow-On Revenue/Incumbent Contracts" },
+                { id: "customer-lifetime-value", title: "Customer Lifetime Value" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "increase-expansion",
+          title: "Increase Expansion",
+          isPrimary: false,
+          valueDrivers: [
+            {
+              id: "cross-selling-upselling",
+              title: "Cross Selling and Upselling",
+              kpis: [
+                { id: "net-new-revenue", title: "Net-New Revenue per Customer" },
+                { id: "product-diversification", title: "New Product/Service Diversification by Customer" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "reduce-customer-costs",
+          title: "Reduce Customer Costs",
+          isPrimary: true,
+          valueDrivers: [
+            {
+              id: "reduce-costs",
+              title: "Reduce Costs",
+              kpis: [
+                { id: "resource-utilization", title: "Resource Utilization – FTE Cost" },
+                { id: "crm-solution-cost", title: "CRM Solution Cost/Cost of Sales" },
+                { id: "retention-costs", title: "Customer/Opportunity Retention Costs" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "increase-operational-efficiency",
+          title: "Increase Operational Efficiency",
+          isPrimary: true,
+          valueDrivers: [
+            {
+              id: "sales-team-efficiency",
+              title: "Sales Team Efficiency",
+              kpis: [
+                { id: "opportunity-response-time", title: "Opportunity Response Time (by Stage)" },
+                { id: "employee-ramp-time", title: "New Employee Ramp Up time (onboarding)" },
+                { id: "productivity-improvement", title: "Employee Productivity Improvement" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "increase-employee-satisfaction",
+          title: "Increase Employee Satisfaction",
+          isPrimary: false,
+          valueDrivers: [
+            {
+              id: "improve-employee-satisfaction",
+              title: "Improve Employee Satisfaction",
+              kpis: [
+                { id: "crm-adoption-rates", title: "CRM Adoption Rates (Usage Rate)" },
+                { id: "employee-satisfaction", title: "Employee Satisfaction/Sentiment (Pulse Survey)" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "increase-customer-satisfaction",
+          title: "Increase Customer Satisfaction",
+          isPrimary: false,
+          valueDrivers: [
+            {
+              id: "improve-customer-service",
+              title: "Improve Customer Service Level",
+              kpis: [
+                { id: "customer-satisfaction-score", title: "Customer Satisfaction Score (CSAT)" },
+                { id: "incentive-conversion", title: "Award/Incentive Fee Conversion Rate" },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+  }
 
   const roiType = data.roiType || ""
   const maxKPIs = roiType === "rom-bvc" ? 4 : null
@@ -349,8 +471,8 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
       <div className="text-center space-y-2">
         <h2 className="text-3xl font-bold text-foreground">Objectives & KPIs Selection</h2>
         <p className="text-muted-foreground max-w-3xl mx-auto">
-          Select business objectives from the {isFieldServices ? "Field Services" : "CCaaS"} Value Tree and choose
-          relevant KPIs to measure success.
+          Select business objectives from the {isFieldServices ? "Field Services" : isCRM ? "CRM" : "CCaaS"} Value Tree
+          and choose relevant KPIs to measure success.
           {maxKPIs && (
             <span className="text-orange-600 font-medium"> ROM BVC analysis is limited to {maxKPIs} KPIs maximum.</span>
           )}
@@ -528,8 +650,8 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                     <h3 className="text-lg font-semibold text-orange-800 mb-2">Coming Soon</h3>
                     <p className="text-orange-700 max-w-md mx-auto">
                       We're working hard to bring you the {platformSelection} value tree with comprehensive objectives
-                      and KPIs. Please select either <strong>CcaaS</strong> or <strong>Field Services</strong> to
-                      continue with your business value case analysis.
+                      and KPIs. Please select either <strong>CcaaS</strong>, <strong>Field Services</strong>, or{" "}
+                      <strong>CRM</strong> to continue with your business value case analysis.
                     </p>
                   </div>
                   <div className="flex justify-center gap-2 mt-6">
@@ -538,6 +660,9 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                     </Badge>
                     <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
                       Field Services - Ready
+                    </Badge>
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                      CRM - Ready
                     </Badge>
                   </div>
                 </div>
@@ -548,96 +673,86 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="h-5 w-5 text-blue-600" />
-                  {isFieldServices ? "Field Services Value Tree" : "CCaaS Value Tree"}
+                  {isFieldServices ? "Field Services Value Tree" : isCRM ? "CRM Value Tree" : "CCaaS Value Tree"}
                 </CardTitle>
                 <CardDescription>
                   A Value Tree can be used as the next layer down to tie financial levers and strategic objectives to
                   measurable KPIs. Select objectives and their associated KPIs for{" "}
-                  {isFieldServices ? "Field Services" : "CCaaS"} implementation.
+                  {isFieldServices ? "Field Services" : isCRM ? "CRM" : "CCaaS"} implementation.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {valueTreeData.financialLevers.map((lever) => (
-                  <div key={lever.id} className="space-y-4">
-                    <div className={`${lever.color} text-white p-3 rounded-lg text-center font-semibold`}>
-                      {lever.name}
-                    </div>
+                {valueTreeData.objectives.map((objective) => {
+                  const isObjectiveSelected = selectedObjectives.some((obj) => obj.id === objective.id)
 
-                    <div className="space-y-3">
-                      {lever.objectives.map((objective) => {
-                        const isObjectiveSelected = selectedObjectives.some((obj) => obj.id === objective.id)
+                  return (
+                    <div key={objective.id} className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <Checkbox
+                          checked={isObjectiveSelected}
+                          onCheckedChange={() => handleObjectiveToggle(objective)}
+                          className="mt-1 h-5 w-5 border-2 border-blue-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold text-pink-600">{objective.title}</h4>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            <strong>Value Driver:</strong> {objective.valueDriver}
+                          </p>
 
-                        return (
-                          <div key={objective.id} className="border rounded-lg p-4 space-y-3">
-                            <div className="flex items-start gap-3">
-                              <Checkbox
-                                checked={isObjectiveSelected}
-                                onCheckedChange={() => handleObjectiveToggle(objective)}
-                                className="mt-1 h-5 w-5 border-2 border-blue-500 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-                              />
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <h4 className="font-semibold text-pink-600">{objective.title}</h4>
-                                </div>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                  <strong>Value Driver:</strong> {objective.valueDriver}
-                                </p>
+                          {/* KPIs for this objective */}
+                          <div className="space-y-2">
+                            <h5 className="text-sm font-medium text-foreground">Key Performance Indicators:</h5>
+                            <div className="grid gap-3">
+                              {objective.valueDrivers.map((valueDriver) =>
+                                valueDriver.kpis.map((kpi: any) => {
+                                  const isKPISelected = selectedKPIs.includes(kpi.title)
+                                  const isKPIDisabled = maxKPIs && selectedKPICount >= maxKPIs && !isKPISelected
+                                  const isInDevelopment =
+                                    kpi.title === "Reduce case resolution time" ||
+                                    kpi.title === "Reduce case volume: channel shift"
 
-                                {/* KPIs for this objective */}
-                                <div className="space-y-2">
-                                  <h5 className="text-sm font-medium text-foreground">Key Performance Indicators:</h5>
-                                  <div className="grid gap-3">
-                                    {objective.kpis.map((kpi) => {
-                                      const isKPISelected = selectedKPIs.includes(kpi)
-                                      const isKPIDisabled = maxKPIs && selectedKPICount >= maxKPIs && !isKPISelected
-                                      const isInDevelopment =
-                                        kpi === "Reduce case resolution time" ||
-                                        kpi === "Reduce case volume: channel shift"
-
-                                      return (
-                                        <div
-                                          key={kpi}
-                                          className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors ${
-                                            isInDevelopment ? "bg-yellow-50 border border-yellow-200" : ""
-                                          }`}
-                                        >
-                                          <Checkbox
-                                            checked={isKPISelected}
-                                            onCheckedChange={() => handleKPIToggle(kpi)}
-                                            disabled={isKPIDisabled || isInDevelopment}
-                                            className={`h-4 w-4 border-2 ${
-                                              isKPIDisabled || isInDevelopment
-                                                ? "border-gray-300 opacity-50"
-                                                : "border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                                            }`}
-                                          />
-                                          <span
-                                            className={`text-sm font-medium ${
-                                              isKPIDisabled || isInDevelopment
-                                                ? "text-muted-foreground"
-                                                : "text-foreground"
-                                            } ${isKPISelected ? "text-green-700" : ""}`}
-                                          >
-                                            {kpi}
-                                            {isInDevelopment && (
-                                              <span className="text-yellow-600 ml-2">
-                                                * <span className="text-xs">(In Development)</span>
-                                              </span>
-                                            )}
+                                  return (
+                                    <div
+                                      key={kpi.id}
+                                      className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors ${
+                                        isInDevelopment ? "bg-yellow-50 border border-yellow-200" : ""
+                                      }`}
+                                    >
+                                      <Checkbox
+                                        checked={isKPISelected}
+                                        onCheckedChange={() => handleKPIToggle(kpi.title)}
+                                        disabled={isKPIDisabled || isInDevelopment}
+                                        className={`h-4 w-4 border-2 ${
+                                          isKPIDisabled || isInDevelopment
+                                            ? "border-gray-300 opacity-50"
+                                            : "border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                        }`}
+                                      />
+                                      <span
+                                        className={`text-sm font-medium ${
+                                          isKPIDisabled || isInDevelopment ? "text-muted-foreground" : "text-foreground"
+                                        } ${isKPISelected ? "text-green-700" : ""}`}
+                                      >
+                                        {kpi.title}
+                                        {isInDevelopment && (
+                                          <span className="text-yellow-600 ml-2">
+                                            * <span className="text-xs">(In Development)</span>
                                           </span>
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-                              </div>
+                                        )}
+                                      </span>
+                                    </div>
+                                  )
+                                }),
+                              )}
                             </div>
                           </div>
-                        )
-                      })}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </CardContent>
             </Card>
           )}

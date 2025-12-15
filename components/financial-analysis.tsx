@@ -301,6 +301,55 @@ function FinancialAnalysis({ data, onUpdate, onNext, onPrevious }: FinancialAnal
         }
       }
 
+      if (kpiName.includes("Employee Productivity Improvement") && data.platformSelection === "crm") {
+        const totalSalesEmployees = Number.parseFloat(assumption.totalSalesEmployees) || 0
+        const timeSpentOnCRM = Number.parseFloat(assumption.timeSpentOnCRM) || 0
+        const averageSalary = Number.parseFloat(assumption.averageSalary) || 0
+        const targetEfficiencyImprovement = Number.parseFloat(assumption.targetEfficiencyImprovement) || 0
+
+        console.log("[v0] CRM Productivity inputs:", {
+          totalSalesEmployees,
+          timeSpentOnCRM,
+          averageSalary,
+          targetEfficiencyImprovement,
+        })
+
+        if (totalSalesEmployees > 0 && timeSpentOnCRM > 0 && averageSalary > 0 && targetEfficiencyImprovement > 0) {
+          // Calculate hours saved per week
+          const hoursSavedPerWeek = totalSalesEmployees * timeSpentOnCRM * (targetEfficiencyImprovement / 100)
+
+          // Calculate annual hours saved (52 weeks)
+          const annualHoursSaved = hoursSavedPerWeek * 52
+
+          // Calculate hourly rate (annual salary / 2080 working hours)
+          const hourlyRate = averageSalary / 2080
+
+          // Calculate annual cost savings
+          const productivityGain = annualHoursSaved * hourlyRate
+
+          calculatedProductivityGains += productivityGain
+          benefitBreakdown.push({
+            kpi: "Employee Productivity Improvement",
+            category: "Productivity Gains",
+            amount: productivityGain,
+            calculation: `${totalSalesEmployees} employees × ${timeSpentOnCRM} hrs/week × ${targetEfficiencyImprovement}% efficiency × 52 weeks × $${hourlyRate.toFixed(2)}/hr`,
+          })
+
+          console.log("[v0] CRM Productivity calculation:", {
+            totalSalesEmployees,
+            timeSpentOnCRM,
+            averageSalary,
+            targetEfficiencyImprovement,
+            hoursSavedPerWeek,
+            annualHoursSaved,
+            hourlyRate,
+            productivityGain,
+          })
+        } else {
+          console.log("[v0] Missing required values for CRM productivity calculation")
+        }
+      }
+
       if (kpiName.includes("RPC") || kpiName.includes("Revenue per Call") || kpiName.includes("revenue per call")) {
         const currentRPC = Number.parseFloat(assumption.currentRPC) || 0
         const targetRPC = Number.parseFloat(assumption.targetRPC) || 0

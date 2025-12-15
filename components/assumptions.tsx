@@ -293,6 +293,36 @@ const kpiAssumptionFields = {
       required: true,
     },
   ],
+  "Employee Productivity Improvement": [
+    {
+      key: "totalSalesEmployees",
+      label: "Total Number of Sales Employees",
+      type: "number",
+      required: true,
+      platformSpecific: "crm",
+    },
+    {
+      key: "timeSpentOnCRM",
+      label: "Total Time Spent on CRM Related Activities (hours/week)",
+      type: "number",
+      required: true,
+      platformSpecific: "crm",
+    },
+    {
+      key: "averageSalary",
+      label: "Average Salary ($)",
+      type: "number",
+      required: true,
+      platformSpecific: "crm",
+    },
+    {
+      key: "targetEfficiencyImprovement",
+      label: "Target Efficiency Improvement (%)",
+      type: "number",
+      required: true,
+      platformSpecific: "crm",
+    },
+  ],
   "Improve employee retention: field technician": [
     { key: "fieldServiceFTEs", label: "Field Service FTEs", type: "number", required: true },
     {
@@ -755,6 +785,15 @@ export function Assumptions({ data, onUpdate, onNext, onPrevious }: AssumptionsP
           return true
         })
       }
+      // Filter fields for CRM platform specific settings
+      if (kpiName === "Employee Productivity Improvement") {
+        fields = fields.filter((field) => {
+          if (field.platformSpecific === "crm" && data.platformSelection !== "crm") {
+            return false
+          }
+          return true
+        })
+      }
 
       return fields
     }
@@ -1036,6 +1075,14 @@ export function Assumptions({ data, onUpdate, onNext, onPrevious }: AssumptionsP
           small: "$50-$100 travel cost per visit",
           medium: "$40-$80 travel cost per visit",
           large: "$30-$60 travel cost per visit",
+        },
+      },
+      // Add CRM industry averages here
+      "Employee Productivity Improvement": {
+        crm: {
+          small: "10-15% time reduction on CRM activities",
+          medium: "15-20% time reduction on CRM activities",
+          large: "20-25% time reduction on CRM activities",
         },
       },
     }
