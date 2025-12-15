@@ -508,7 +508,7 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                       Top Use Cases
                     </h4>
                     <ul className="space-y-2">
-                      {industryInsights.useCases.slice(0, 3).map((useCase, index) => (
+                      {(industryInsights.useCases || []).slice(0, 3).map((useCase, index) => (
                         <li key={index} className="text-sm bg-white p-3 rounded border-l-4 border-green-500">
                           <div className="font-medium text-green-800">{useCase.title}</div>
                           <div className="text-green-600 text-xs mt-1">{useCase.description}</div>
@@ -543,7 +543,7 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                       Key Challenges
                     </h4>
                     <ul className="space-y-2">
-                      {industryInsights.challenges.slice(0, 3).map((challenge, index) => (
+                      {(industryInsights.challenges || []).slice(0, 3).map((challenge, index) => (
                         <li key={index} className="text-sm bg-white p-3 rounded border-l-4 border-orange-500">
                           <div className="font-medium text-orange-800">{challenge.title}</div>
                           <div className="text-orange-600 text-xs mt-1">{challenge.description}</div>
@@ -580,7 +580,7 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                       Opportunities
                     </h4>
                     <ul className="space-y-2">
-                      {industryInsights.opportunities.slice(0, 3).map((opportunity, index) => (
+                      {(industryInsights.opportunities || []).slice(0, 3).map((opportunity, index) => (
                         <li key={index} className="text-sm bg-white p-3 rounded border-l-4 border-blue-500">
                           <div className="font-medium text-blue-800">{opportunity.title}</div>
                           <div className="text-blue-600 text-xs mt-1">{opportunity.description}</div>
@@ -888,7 +888,7 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
             <div className="mt-3">
               <div className="font-medium text-blue-700 mb-2">Key Trends</div>
               <div className="flex flex-wrap gap-2">
-                {industryInsights.marketData.keyTrends.map((trend: string, index: number) => (
+                {(industryInsights.marketData.keyTrends || []).map((trend: string, index: number) => (
                   <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-700 text-xs">
                     {trend}
                   </Badge>
