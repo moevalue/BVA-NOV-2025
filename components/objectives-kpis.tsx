@@ -169,8 +169,12 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
   const isSupportedPlatform = isFieldServices || isCcaaS || isCRM
 
   let valueTreeData = ccaasValueTreeData
+  let normalizedObjectives: any[] = []
+
   if (isFieldServices) {
     valueTreeData = fieldServicesValueTreeData
+    // Field Services uses financialLevers structure
+    normalizedObjectives = valueTreeData.financialLevers?.flatMap((lever: any) => lever.objectives || []) || []
   } else if (isCRM) {
     // CRM value tree data
     valueTreeData = {
@@ -288,6 +292,11 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
         },
       ],
     }
+    // CRM uses direct objectives structure
+    normalizedObjectives = valueTreeData.objectives || []
+  } else {
+    // CCaaS uses financialLevers structure
+    normalizedObjectives = valueTreeData.financialLevers?.flatMap((lever: any) => lever.objectives || []) || []
   }
 
   const roiType = data.roiType || ""
@@ -682,7 +691,7 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {valueTreeData.objectives.map((objective) => {
+                {normalizedObjectives.map((objective) => {
                   const isObjectiveSelected = selectedObjectives.some((obj) => obj.id === objective.id)
 
                   return (
@@ -697,55 +706,108 @@ const ObjectivesKPIs = ({ data, onUpdate, onNext, onPrevious }: ObjectivesKPIsPr
                           <div className="flex items-center gap-2 mb-2">
                             <h4 className="font-semibold text-pink-600">{objective.title}</h4>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            <strong>Value Driver:</strong> {objective.valueDriver}
-                          </p>
+                          {objective.valueDriver && (
+                            <p className="text-sm text-muted-foreground mb-2">
+                              <strong>Value Driver:</strong> {objective.valueDriver}
+                            </p>
+                          )}
 
                           {/* KPIs for this objective */}
                           <div className="space-y-2">
                             <h5 className="text-sm font-medium text-foreground">Key Performance Indicators:</h5>
                             <div className="grid gap-3">
-                              {objective.valueDrivers.map((valueDriver) =>
-                                valueDriver.kpis.map((kpi: any) => {
-                                  const isKPISelected = selectedKPIs.includes(kpi.title)
-                                  const isKPIDisabled = maxKPIs && selectedKPICount >= maxKPIs && !isKPISelected
-                                  const isInDevelopment =
-                                    kpi.title === "Reduce case resolution time" ||
-                                    kpi.title === "Reduce case volume: channel shift"
+                              {objective.valueDrivers
+                                ? // CRM structure with nested valueDrivers
+                                  objective.valueDrivers.map((valueDriver: any) => (
+                                    <div key={valueDriver.id} className="space-y-2">
+                                      <div className="text-xs font-medium text-muted-foreground pl-2">
+                                        {valueDriver.title}
+                                      </div>
+                                      {(valueDriver.kpis || []).map((kpi: any) => {
+                                        const isKPISelected = selectedKPIs.includes(kpi.title)
+                                        const isKPIDisabled = maxKPIs && selectedKPICount >= maxKPIs && !isKPISelected
+                                        const isInDevelopment =
+                                          kpi.title === "Reduce case resolution time" ||
+                                          kpi.title === "Reduce case volume: channel shift"
 
-                                  return (
-                                    <div
-                                      key={kpi.id}
-                                      className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors ${
-                                        isInDevelopment ? "bg-yellow-50 border border-yellow-200" : ""
-                                      }`}
-                                    >
-                                      <Checkbox
-                                        checked={isKPISelected}
-                                        onCheckedChange={() => handleKPIToggle(kpi.title)}
-                                        disabled={isKPIDisabled || isInDevelopment}
-                                        className={`h-4 w-4 border-2 ${
-                                          isKPIDisabled || isInDevelopment
-                                            ? "border-gray-300 opacity-50"
-                                            : "border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
-                                        }`}
-                                      />
-                                      <span
-                                        className={`text-sm font-medium ${
-                                          isKPIDisabled || isInDevelopment ? "text-muted-foreground" : "text-foreground"
-                                        } ${isKPISelected ? "text-green-700" : ""}`}
-                                      >
-                                        {kpi.title}
-                                        {isInDevelopment && (
-                                          <span className="text-yellow-600 ml-2">
-                                            * <span className="text-xs">(In Development)</span>
-                                          </span>
-                                        )}
-                                      </span>
+                                        return (
+                                          <div
+                                            key={kpi.id}
+                                            className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors ${
+                                              isInDevelopment ? "bg-yellow-50 border border-yellow-200" : ""
+                                            }`}
+                                          >
+                                            <Checkbox
+                                              checked={isKPISelected}
+                                              onCheckedChange={() => handleKPIToggle(kpi.title)}
+                                              disabled={isKPIDisabled || isInDevelopment}
+                                              className={`h-4 w-4 border-2 ${
+                                                isKPIDisabled || isInDevelopment
+                                                  ? "border-gray-300 opacity-50"
+                                                  : "border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                              }`}
+                                            />
+                                            <span
+                                              className={`text-sm font-medium ${
+                                                isKPIDisabled || isInDevelopment
+                                                  ? "text-muted-foreground"
+                                                  : "text-foreground"
+                                              } ${isKPISelected ? "text-green-700" : ""}`}
+                                            >
+                                              {kpi.title}
+                                              {isInDevelopment && (
+                                                <span className="text-yellow-600 ml-2">
+                                                  * <span className="text-xs">(In Development)</span>
+                                                </span>
+                                              )}
+                                            </span>
+                                          </div>
+                                        )
+                                      })}
                                     </div>
-                                  )
-                                }),
-                              )}
+                                  ))
+                                : // CCaaS/Field Services structure with direct kpis array
+                                  (objective.kpis || []).map((kpi: string) => {
+                                    const isKPISelected = selectedKPIs.includes(kpi)
+                                    const isKPIDisabled = maxKPIs && selectedKPICount >= maxKPIs && !isKPISelected
+                                    const isInDevelopment =
+                                      kpi === "Reduce case resolution time" ||
+                                      kpi === "Reduce case volume: channel shift"
+
+                                    return (
+                                      <div
+                                        key={kpi}
+                                        className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors ${
+                                          isInDevelopment ? "bg-yellow-50 border border-yellow-200" : ""
+                                        }`}
+                                      >
+                                        <Checkbox
+                                          checked={isKPISelected}
+                                          onCheckedChange={() => handleKPIToggle(kpi)}
+                                          disabled={isKPIDisabled || isInDevelopment}
+                                          className={`h-4 w-4 border-2 ${
+                                            isKPIDisabled || isInDevelopment
+                                              ? "border-gray-300 opacity-50"
+                                              : "border-green-500 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                          }`}
+                                        />
+                                        <span
+                                          className={`text-sm font-medium ${
+                                            isKPIDisabled || isInDevelopment
+                                              ? "text-muted-foreground"
+                                              : "text-foreground"
+                                          } ${isKPISelected ? "text-green-700" : ""}`}
+                                        >
+                                          {kpi}
+                                          {isInDevelopment && (
+                                            <span className="text-yellow-600 ml-2">
+                                              * <span className="text-xs">(In Development)</span>
+                                            </span>
+                                          )}
+                                        </span>
+                                      </div>
+                                    )
+                                  })}
                             </div>
                           </div>
                         </div>
