@@ -27,6 +27,125 @@ interface ObjectivesProps {
   onPrevious: () => void
 }
 
+const crmValueTreeData = {
+  strategicObjective: "CRM Value",
+  financialLevers: [
+    {
+      id: "sales-opportunities",
+      name: "Increase Sales Opportunities",
+      color: "bg-gradient-to-r from-pink-500 to-orange-500",
+      objectives: [
+        {
+          id: "improve-revenue",
+          number: "1",
+          title: "Increase Sales Opportunities",
+          valueDriver: "Improve Revenue",
+          kpis: [
+            "Average Sale/Customer",
+            "Opportunity Win Rate",
+            "Proposed Margin/Target Margin by Customer",
+            "New business opportunities/new customers",
+            "New Customer Engagement/Opportunity",
+            "Opportunity Lead-Time/Customer",
+          ],
+        },
+      ],
+    },
+    {
+      id: "customer-retention",
+      name: "Increase Customer Retention",
+      color: "bg-gradient-to-r from-gray-600 to-gray-700",
+      objectives: [
+        {
+          id: "incumbency-success",
+          number: "2",
+          title: "Increase Customer Retention",
+          valueDriver: "Incumbency Success",
+          kpis: ["Net Follow-On Revenue/Incumbent Contracts", "Customer Lifetime Value"],
+        },
+      ],
+    },
+    {
+      id: "expansion",
+      name: "Increase Expansion",
+      color: "bg-gradient-to-r from-gray-600 to-gray-700",
+      objectives: [
+        {
+          id: "cross-selling-upselling",
+          number: "3",
+          title: "Increase Expansion",
+          valueDriver: "Cross Selling and Upselling",
+          kpis: ["Net-New Revenue per Customer", "New Product/Service Diversification by Customer"],
+        },
+      ],
+    },
+    {
+      id: "reduce-costs",
+      name: "Reduce Customer Costs",
+      color: "bg-gradient-to-r from-pink-500 to-orange-500",
+      objectives: [
+        {
+          id: "reduce-costs-driver",
+          number: "4",
+          title: "Reduce Customer Costs",
+          valueDriver: "Reduce Costs",
+          kpis: [
+            "Resource Utilization – FTE Cost",
+            "CRM Solution Cost/ Cost of Sales",
+            "Customer/Opportunity Retention Costs",
+          ],
+        },
+      ],
+    },
+    {
+      id: "operational-efficiency",
+      name: "Increase Operational Efficiency",
+      color: "bg-gradient-to-r from-pink-500 to-orange-500",
+      objectives: [
+        {
+          id: "sales-team-efficiency",
+          number: "5",
+          title: "Increase Operational Efficiency",
+          valueDriver: "Sales Team Efficiency",
+          kpis: [
+            "Opportunity Response Time (by Stage)",
+            "New Employee Ramp Up time (onboarding)",
+            "Employee Productivity Improvement",
+          ],
+        },
+      ],
+    },
+    {
+      id: "employee-satisfaction",
+      name: "Increase Employee Satisfaction",
+      color: "bg-gradient-to-r from-gray-600 to-gray-700",
+      objectives: [
+        {
+          id: "improve-employee-satisfaction",
+          number: "6",
+          title: "Increase Employee Satisfaction",
+          valueDriver: "Improve Employee Satisfaction",
+          kpis: ["CRM Adoption Rates (Usage Rate)", "Employee Satisfaction/Sentiment (Pulse Survey)"],
+        },
+      ],
+    },
+    {
+      id: "customer-satisfaction",
+      name: "Increase Customer Satisfaction",
+      color: "bg-gradient-to-r from-gray-600 to-gray-700",
+      objectives: [
+        {
+          id: "improve-customer-service",
+          number: "7",
+          title: "Increase Customer Satisfaction",
+          valueDriver: "Improve Customer Service Level",
+          kpis: ["Customer Satisfaction Score (CSAT)", "Award/Incentive Fee Conversion Rate"],
+        },
+      ],
+    },
+  ],
+}
+
 const valueTreeData = {
   strategicObjective: "CCaaS Value",
   financialLevers: [
@@ -209,19 +328,28 @@ export function Objectives({ data, onUpdate, onNext, onPrevious }: ObjectivesPro
     return priorities.find((pri) => pri.value === value)?.color || "bg-gray-100 text-gray-800"
   }
 
+  const platformSelection = data.platformSelection || "ccaas"
+  const currentValueTree = platformSelection === "crm" ? crmValueTreeData : valueTreeData
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold text-foreground mb-2">Business Objectives</h2>
-        <p className="text-muted-foreground">Select objectives from the CCaaS Value Tree or define custom objectives</p>
+        <p className="text-muted-foreground">
+          Select objectives from the {platformSelection === "crm" ? "CRM" : "CCaaS"} Value Tree or define custom
+          objectives
+        </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg text-orange-600">CCaaS Value Tree</CardTitle>
+          <CardTitle className="text-lg text-orange-600">
+            {platformSelection === "crm" ? "CRM Value Tree" : "CCaaS Value Tree"}
+          </CardTitle>
           <CardDescription>
             A Value Tree can be used as the next layer down to tie financial levers and strategic objectives to
-            measurable KPIs. Below is an illustrative view for the CCaaS value tree.
+            measurable KPIs. Below is an illustrative view for the {platformSelection === "crm" ? "CRM" : "CCaaS"} value
+            tree.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -229,13 +357,13 @@ export function Objectives({ data, onUpdate, onNext, onPrevious }: ObjectivesPro
             {/* Strategic Objective */}
             <div className="text-center">
               <div className="inline-block bg-gradient-to-r from-pink-600 to-orange-500 text-white px-6 py-3 rounded-lg font-semibold text-lg">
-                {valueTreeData.strategicObjective}
+                {currentValueTree.strategicObjective}
               </div>
             </div>
 
             {/* Financial Levers and Objectives */}
             <div className="grid gap-6 lg:grid-cols-3">
-              {valueTreeData.financialLevers.map((lever) => (
+              {currentValueTree.financialLevers.map((lever) => (
                 <div key={lever.id} className="space-y-4">
                   {/* Financial Lever */}
                   <div className="text-center">
@@ -344,7 +472,9 @@ export function Objectives({ data, onUpdate, onNext, onPrevious }: ObjectivesPro
               Add Custom
             </Button>
           </CardTitle>
-          <CardDescription>Add additional objectives not covered in the value tree</CardDescription>
+          <CardDescription>
+            Add additional objectives not covered in the {platformSelection === "crm" ? "CRM" : "CCaaS"} value tree
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {showCustomForm && (
